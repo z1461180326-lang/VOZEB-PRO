@@ -6,6 +6,13 @@ import { agentPlannerInput, agentPlannerSystemPrompt, buildAgentPlannerInput, co
 import { filterAgentPlannerModels, resolveAgentPlanningProfile } from "./agent-run-planning-profile";
 
 describe("selectAgentSkills", () => {
+    it("offers product modules only when explicitly selected", () => {
+        expect(selectAgentSkills(DEFAULT_SETTINGS, "chat", ["ecommerce-product-modules"]).map((skill) => skill.id)).toEqual(["ecommerce-product-modules"]);
+        expect(selectAgentSkills(DEFAULT_SETTINGS, "canvas", ["ecommerce-product-modules"]).map((skill) => skill.id)).toEqual(["ecommerce-product-modules"]);
+        expect(selectAgentSkills(DEFAULT_SETTINGS, "chat", [])).toEqual([]);
+        expect(plannerAgentSkills(DEFAULT_SETTINGS, { surface: "chat", selectedSkillIds: ["ecommerce-product-modules"] })[0]?.plannerSummary).toContain("dependencies");
+    });
+
     it("honors an explicitly selected compatible skill without keyword text", () => {
         const skills = selectAgentSkills(DEFAULT_SETTINGS, "chat", ["character-design"]);
         expect(skills.map((skill) => skill.id)).toContain("character-design");

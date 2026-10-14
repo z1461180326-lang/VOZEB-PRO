@@ -1,8 +1,15 @@
 import { describe, expect, it } from "vitest";
 
-import { normalizeAgentSkill } from "./store-normalizers";
+import { normalizeAgentSkill, normalizeAgentSkills } from "./store-normalizers";
+import { ECOMMERCE_PRODUCT_MODULES_SKILL } from "@/lib/server/agent-skills/ecommerce-product-modules";
 
 describe("normalizeAgentSkill", () => {
+    it("installs the product-modules Skill into existing settings without replacing a saved choice", () => {
+        const existing = [{ ...ECOMMERCE_PRODUCT_MODULES_SKILL, enabled: false }];
+        expect(normalizeAgentSkills([]).filter((skill) => skill.id === ECOMMERCE_PRODUCT_MODULES_SKILL.id)).toHaveLength(1);
+        expect(normalizeAgentSkills(existing).find((skill) => skill.id === ECOMMERCE_PRODUCT_MODULES_SKILL.id)?.enabled).toBe(false);
+    });
+
     it("derives a zero-configuration planner summary and preserves full execution instructions", () => {
         const instructions = "完整执行规则".repeat(100);
         const skill = normalizeAgentSkill({ id: "skill", name: "技能", description: "用于规划的简要用途", instructions, enabled: true, keywords: [] });
